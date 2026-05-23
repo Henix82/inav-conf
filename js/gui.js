@@ -41,17 +41,16 @@ var GUI_control = function () {
         'pid_tuning',
         'ports',
         'receiver',
-        'sensors',
         'calibration',
         'setup',
-        'osd',
         'profiles',
         'advanced_tuning',
         'mission_control',
         'mixer',
         'programming',
         'ez_tune',
-        'search'
+        'search',
+        'telemetry'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -323,10 +322,22 @@ GUI_control.prototype.simpleBind = function () {
     });
 };
 
-GUI_control.prototype.load = function(rel, callback) {
-    const content = $('#content').addClass('loading');
+GUI_control.prototype.load = function(rel, callback, target) {
+    const content = target ? $(target) : $('#content');
+
+    content.addClass('loading');
+
     $.get(rel, function(data) {
+        if (target) {
+            content.empty();
+        }
+
         $(data).appendTo(content);
+
+        if (target) {
+            content.removeClass('loading');
+        }
+
         if (callback) {
             callback();
         }

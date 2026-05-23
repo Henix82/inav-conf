@@ -3461,12 +3461,11 @@ HARDWARE.update = function(callback) {
 };
 
 TABS.osd = {};
-TABS.osd.initialize = function (callback) {
-
+TABS.osd.initialize = function (callback, options = {}) {
     mspHelper.loadServoMixRules();
     mspHelper.loadLogicConditions();
 
-    if (GUI.active_tab != 'osd') {
+    if (!options.embedded && GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
     }
 
@@ -3651,8 +3650,16 @@ TABS.osd.initialize = function (callback) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
 
-            GUI.content_ready(callback);
-        }));
+            if (options.embedded) {
+                GUI.switchery();
+
+                if (callback) {
+                    callback();
+                }
+            } else {
+                GUI.content_ready(callback);
+            }
+        }),options.target);
     });
 };
 

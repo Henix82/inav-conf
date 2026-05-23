@@ -6181,5 +6181,8 @@
     },
    "search": {
         "message": "Search"
+    },
+    "tabTelemetry": {
+        "message": "Telemetry"
     }
 }

@@ -21,7 +21,6 @@ TABS.pid_tuning = {
 };
 
 TABS.pid_tuning.initialize = function (callback) {
-
     var loadChainer = new MSPChainerClass();
 
     let EZ_TUNE_PID_RP_DEFAULT = [40, 75, 23, 100];

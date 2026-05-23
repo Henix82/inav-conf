@@ -15,10 +15,10 @@ const i18n = require('./../js/localization');
 const BitHelper = require('./../js/bitHelper');
 
 TABS.sensors = {};
-TABS.sensors.initialize = function (callback) {
+TABS.sensors.initialize = function (callback, options = {}) {
     var self = this;
 
-    if (GUI.active_tab != 'sensors') {
+    if (!options.embedded && GUI.active_tab != 'sensors') {
         GUI.active_tab = 'sensors';
     }
 
@@ -560,12 +560,31 @@ TABS.sensors.initialize = function (callback) {
            debugWin.window.getDebugTrace = function () { return FC.DEBUG_TRACE || ''; };
         });
 
-        GUI.content_ready(callback);
-    });
+        if (options.embedded) {
+            GUI.switchery();
+
+            if (callback) {
+                callback();
+            }
+        } else {
+            GUI.content_ready(callback);
+        }
+    },options.target);
 };
 
 TABS.sensors.cleanup = function (callback) {
+    interval.killAll([
+        'IMU_pull',
+        'altitude_pull',
+        'sonar_pull',
+        'airspeed_pull',
+        'temperature_pull',
+        'debug_pull',
+    ]);
+
     CONFIGURATOR.connection.emptyOutputBuffer();
 
-    if (callback) callback();
+    if (callback) {
+        callback();
+    }
 };
