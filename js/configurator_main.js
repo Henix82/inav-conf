@@ -122,6 +122,21 @@ $(function() {
 
         // Tabs
         var ui_tabs = $('#tabs > ul');
+
+        const DEV_SHOW_ALL_TABS = true;
+
+        if (DEV_SHOW_ALL_TABS) {
+            GUI.allowedTabs = [
+                ...new Set([
+                    ...GUI.defaultAllowedTabsWhenDisconnected,
+                    ...GUI.defaultAllowedTabsWhenConnected,
+                ]),
+            ];
+
+            $('#tabs .mode-connected').show().removeClass('is-hidden');
+            $('#tabs .mode-disconnected').show().removeClass('is-hidden');
+        }
+
         $('a', ui_tabs).on('click', function() {
 
             if ($(this).parent().hasClass("tab_help")) {
@@ -137,7 +152,7 @@ $(function() {
                 var tab = tabClass.substring(4);
                 var tabName = $(self).text();
 
-                if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
+                if (!DEV_SHOW_ALL_TABS && tabRequiresConnection && !CONFIGURATOR.connectionValid) {
                     GUI.log(i18n.getMessage('tabSwitchConnectionRequired'));
                     return;
                 }
@@ -147,7 +162,7 @@ $(function() {
                     return;
                 }
 
-                if (GUI.allowedTabs.indexOf(tab) < 0) {
+                if (!DEV_SHOW_ALL_TABS && GUI.allowedTabs.indexOf(tab) < 0) {
                     GUI.log(i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                     return;
                 }
