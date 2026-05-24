@@ -42,7 +42,7 @@ function setVisibleSubtab(childTabName) {
 
     $root.find('#' + childTab.subtabId)
         .addClass('subtab__content--current');
-        
+
     $root.find('#' + childTab.subtabId).append($(CHILD_CONTAINER));
 }
 
@@ -133,7 +133,7 @@ TABS.telemetry.initialize = function (callback) {
             });
         GUI.content_ready(callback);
 
-        loadChildTab('osd');
+        loadChildTab('sensors');
     });
 };
 
