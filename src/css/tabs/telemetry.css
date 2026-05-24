@@ -1,0 +1,76 @@
+.tab-telemetry {
+    height: 100%;
+}
+
+.tab-telemetry #telemetry-wrapper {
+    height: 100%;
+}
+
+.tab-telemetry .telemetry-tabs {
+    display: block;
+    width: calc(100% - 150px);
+    min-height: 39px;
+    margin: 0 0 10px 0;
+    padding: 0;
+    overflow: visible;
+}
+
+.tab-telemetry .telemetry-tabs .subtab__header_label {
+    display: block;
+    float: left;
+    min-width: 180px;
+    height: 39px;
+    line-height: 39px;
+    margin: 0 5px 0 0;
+    padding: 0 22px;
+    box-sizing: border-box;
+    background-color: #eeeeee;
+    color: #333333;
+    font-size: 20px;
+    font-family: 'open_sansregular', Arial, serif;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tab-telemetry .telemetry-tabs .subtab__header_label--current {
+    background-color: #c9c9c9;
+    color: #222222;
+}
+
+.tab-telemetry .telemetry-tabs::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.tab-telemetry .telemetry-subtab {
+    display: none;
+    width: 100%;
+    height: calc(100% - 50px);
+    overflow: auto;
+}
+
+.tab-telemetry .telemetry-subtab.subtab__content--current {
+    display: block;
+}
+
+.tab-telemetry .telemetry-child-container {
+    width: 100%;
+    min-height: 100%;
+}
+
+.tab-telemetry .telemetry-child-container > .tab-osd,
+.tab-telemetry .telemetry-child-container > .tab-sensors {
+    width: 100%;
+    min-height: 100%;
+}
+
+.tab-telemetry .telemetry-child-container .content_wrapper {
+    min-height: 100%;
+}
+
+.tab-telemetry .telemetry-child-container .content_toolbar {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
