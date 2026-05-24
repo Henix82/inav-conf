@@ -11,6 +11,8 @@ require('./sensors');
 TABS.telemetry = {};
 
 TABS.telemetry.activeChildTab = null;
+TABS.telemetry.childLoading = false;
+TABS.telemetry.loadToken = 0;
 
 const CHILD_CONTAINER = '#telemetry-child-container';
 
@@ -24,6 +26,26 @@ const CHILD_TABS = {
         subtabId: 'subtab-telemetry-sensors',
     },
 };
+
+function setChildLoading(isLoading) {
+    TABS.telemetry.childLoading = isLoading;
+
+    const $root = $('.tab-telemetry');
+
+    $root.find('.subtab__header_label')
+        .toggleClass('disabled', isLoading);
+
+    if (isLoading) {
+        if (!$root.find('.telemetry-child-loader').length) {
+            $root.find('#telemetry-wrapper')
+                .append('<div class="telemetry-child-loader"><div class="data-loading"></div></div>');
+        }
+
+        return;
+    }
+
+    $root.find('.telemetry-child-loader').remove();
+}
 
 function setVisibleSubtab(childTabName) {
     const $root = $('.tab-telemetry');
@@ -82,30 +104,60 @@ function cleanupChildTab(callback) {
     }
 }
 
-function loadChildTab(childTabName) {
+function loadChildTab(childTabName, callback) {
     const childTab = CHILD_TABS[childTabName];
 
     if (!childTab) {
+        if (callback) {
+            callback();
+        }
+
+        return;
+    }
+
+    if (TABS.telemetry.childLoading) {
         return;
     }
 
     if (TABS.telemetry.activeChildTab === childTabName) {
         setVisibleSubtab(childTabName);
+
+        if (callback) {
+            callback();
+        }
+
         return;
     }
 
+    const loadToken = ++TABS.telemetry.loadToken;
+
     setVisibleSubtab(childTabName);
+    setChildLoading(true);
 
     cleanupChildTab(function () {
+        if (loadToken !== TABS.telemetry.loadToken || GUI.active_tab !== 'telemetry') {
+            return;
+        }
+
         setVisibleSubtab(childTabName);
 
         TABS.telemetry.activeChildTab = childTabName;
+
         TABS[childTab.tabName].initialize(function () {
+            if (loadToken !== TABS.telemetry.loadToken || GUI.active_tab !== 'telemetry') {
+                return;
+            }
 
             GUI.active_tab = 'telemetry';
 
             i18n.localize();
             GUI.switchery();
+
+            setChildLoading(false);
+
+            if (callback) {
+                callback();
+            }
         }, {
             embedded: true,
             target: CHILD_CONTAINER,
@@ -119,8 +171,15 @@ TABS.telemetry.initialize = function (callback) {
     }
 
     TABS.telemetry.activeChildTab = null;
+    TABS.telemetry.childLoading = false;
+
+    const initializeToken = ++TABS.telemetry.loadToken;
 
     GUI.load(path.join(__dirname, 'telemetry.html'), function () {
+        if (initializeToken !== TABS.telemetry.loadToken || GUI.active_tab !== 'telemetry') {
+            return;
+        }
+
         const $root = $('.tab-telemetry');
 
         i18n.localize();
@@ -128,20 +187,33 @@ TABS.telemetry.initialize = function (callback) {
         $root.find('.subtab__header_label')
             .off('click.telemetry')
             .on('click.telemetry', function () {
+                if (TABS.telemetry.childLoading) {
+                    return;
+                }
+
                 const childTabName = $(this).data('telemetry-tab');
+
                 loadChildTab(childTabName);
             });
-        GUI.content_ready(callback);
 
-        loadChildTab('sensors');
+        loadChildTab('osd', function () {
+            GUI.content_ready(callback);
+        });
     });
 };
 
 TABS.telemetry.cleanup = function (callback) {
+    TABS.telemetry.loadToken += 1;
+
+    setChildLoading(false);
+
     $('.tab-telemetry .subtab__header_label').off('click.telemetry');
 
     cleanupChildTab(function () {
         $(CHILD_CONTAINER).empty();
+
+        TABS.telemetry.activeChildTab = null;
+        TABS.telemetry.childLoading = false;
 
         if (callback) {
             callback();
